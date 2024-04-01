@@ -1,5 +1,5 @@
 #Command to initialzie the Website "locally"
-streamlit run index.py --server.enableCORS false --server.enableXsrfProtection false
+streamlit run Home.py --server.enableCORS false --server.enableXsrfProtection false
 
 #local address of running app:
 http://127.0.0.1:8503/
