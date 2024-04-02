@@ -15,7 +15,7 @@ class SpoonacularAPI:
         A list of valid diets that can be used with the Spoonacular API. Will not change.
     _BASE_URL : str
         The base URL for the Spoonacular API. Will not change.
-    _api_key : str
+    _API_KEY : str
         The API key for the Spoonacular API.
     diet : str
         The diet to use when generating meal plans. Must be one of the valid diets.
@@ -136,7 +136,7 @@ class SpoonacularAPI:
         # Checks if the parameters are valid and sets them to None if they are not
         # TODO: Add error handling here to raise errors when a parameter is wrong
         params = {
-                    "apiKey": self._api_key,
+                    "apiKey": self._API_KEY,
                     "timeframe": timeframe if timeframe in ["day", "week"] else "week",
                     "targetCalories": targetCalories if  type(targetCalories) == int and targetCalories > 0 else None,
                     "diet": self.validate_diet(diet),
