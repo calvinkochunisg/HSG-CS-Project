@@ -6,7 +6,7 @@ from streamlit.logger import get_logger
 
 def Home():
     st.set_page_config(
-        page_title="Foodplanner",
+        page_title="Foodplannerings",
         page_icon="🍲",
     )
 
