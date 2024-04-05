@@ -15,7 +15,7 @@ class SpoonacularAPI:
         A list of valid diets that can be used with the Spoonacular API. Will not change.
     _BASE_URL : str
         The base URL for the Spoonacular API. Will not change.
-    _API_KEY : str
+    _api_key : str
         The API key for the Spoonacular API.
     diet : str
         The diet to use when generating meal plans. Must be one of the valid diets.
@@ -138,7 +138,7 @@ class SpoonacularAPI:
         params = {
                     "apiKey": self._API_KEY,
                     "timeframe": timeframe if timeframe in ["day", "week"] else "week",
-                    "targetCalories": targetCalories if  type(targetCalories) == int and targetCalories > 0 else None,
+                    "targetCalories": targetCalories if type(targetCalories) == int and targetCalories > 0 else None,
                     "diet": self.validate_diet(diet),
                     "exclude": ",".join(exclude) if exclude else None
                   }
@@ -173,5 +173,5 @@ Here the module can be testet, the following code will not be excecuted when imp
 See Documentation of " if __name__ == "__main__": " here: https://realpython.com/if-name-main-python/
 """
 if __name__ == "__main__":
-    sp = SpoonacularAPI(diet = "vegetarian")
-    print(sp.generate_meal_plan())
+    sp = SpoonacularAPI()
+    print(sp.generate_meal_plan(diet = "vegetarian"))
