@@ -30,7 +30,7 @@ def Home():
     st.title('Mealplan Inputs')
     with st.expander('open options'):
         targetCalories = st.number_input("Target Calories", value=None, min_value = 0, max_value = 10000, placeholder="Insert your target Calories in kcal ...")
-        diet = st.selectbox ('Do you follow any special diets?', VALID_DIETS)
+        diet = st.multiselect ('Do you follow any special diets?', VALID_DIETS)
         exclude = st.multiselect ('Is there something you cannot eat?', EXCLUDE)
 
     if st.button('Generate Meal Plan'):
@@ -41,15 +41,15 @@ def Home():
         prediction = pred.pred(url_user, user_input1, user_input2, user_input3, user_input4, user_weight)
         st.write(prediction)
 
-    mealplan = MealPlan(url_user)
+        mealplan = MealPlan(url_user)
 
-    day = st.selectbox('Select a day', ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'])
-    meals = mealplan.get_day_mealplan(day)
+        day = st.selectbox('Select a day', ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'])
+        meals = mealplan.get_day_mealplan(day)
 
-    st.write(f"Meals for {day}:")
-    for i, meal in enumerate(meals):
-        st.write(f"Meal {i+1}: {meal['title']}")
+        st.write(f"Meals for {day}:")
+        for i, meal in enumerate(meals):
+            st.write(f"Meal {i+1}: {meal['title']}")
 
-    nutrients = mealplan.get_nutrient_info(day)
-    st.write(f"Nutrient info for {day}: {nutrients}")
+        nutrients = mealplan.get_nutrient_info(day)
+        st.write(f"Nutrient info for {day}: {nutrients}")
 Home()
