@@ -76,7 +76,8 @@ class SpoonacularAPI:
             If the diet is not one of the valid diets.
         """
         if diet is not None and diet not in self._VALID_DIETS: # valid diets are defined in the __init__ method
-            raise ValueError(f"Invalid diet: {diet}. Valid options are: {', '.join(self._VALID_DIETS)}")
+            return None
+            #raise ValueError(f"Invalid diet: {diet}. Valid options are: {', '.join(self._VALID_DIETS)}")
         return diet
 
 
