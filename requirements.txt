@@ -5,7 +5,3 @@ pydeck
 streamlit
 requests
 matplotlib
-json
-pickle
-io
-mpl_toolkits
