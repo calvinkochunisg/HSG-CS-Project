@@ -151,19 +151,12 @@ class SpoonacularAPI:
         url = self.construct_url(endpoint, params)
 
         # Make the request to the API and raise an error if it fails
-        try:
-            response = requests.get(url)
-            response.raise_for_status()  # Raises a HTTPError if the response was an error
-        except requests.RequestException as e:
-            print(f"An error occurred while making the request: {e}")
+        response = requests.get(url)
+        if response.status_code == 200:
+            return response.json()
+        else:
+            response.raise_for_status()
             return None
-
-        # Save the response as a json object in data
-        data = response.json()
-
-        # TODO: Process Data here. Structure data and return it in a nice way for UI
-
-        return url
 
 
 

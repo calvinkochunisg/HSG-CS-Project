@@ -10,18 +10,14 @@ from mpl_toolkits.axes_grid1 import host_subplot
 
 class Prediction:
 
-    def parse(url):    
-        response = requests.get(url)
+    def parse(data):    
+        parsed_data = data
 
-        if response.status_code == 200:
-            data = response.json()
-        else:
-            print(f"Failed to fetch data, status code: {response.status_code}")
-            return None
+    
         structured_nutrients = []
 
         # Iterate over each day in the data
-        for day, content in data['week'].items():
+        for day, content in parsed_data['week'].items():
             # Extract nutrients data and include the day of the week
             nutrients_data = {
                 'Day': day.capitalize(),
@@ -38,8 +34,8 @@ class Prediction:
         user_cal = user_cal[["calories"]]
         return user_cal
 
-    def convert(url, walk_days, run_days, weights_days, wine_days):
-        user_cal = Prediction.parse(url)
+    def convert(data, walk_days, run_days, weights_days, wine_days):
+        user_cal = Prediction.parse(data)
         # get function for url
         week = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
         walk = []
@@ -82,9 +78,9 @@ class Prediction:
         user_data.index = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
         return user_data
     
-    def pred(url_user, user_input1, user_input2, user_input3, user_input4, weight):
+    def pred(data_user, user_input1, user_input2, user_input3, user_input4, weight):
         url = "https://github.com/calvinkochunisg/HSG-CS-Project/raw/dev/Data/model.sav"
-        user_data = Prediction.convert(url_user, user_input1, user_input2, user_input3, user_input4)
+        user_data = Prediction.convert(data_user, user_input1, user_input2, user_input3, user_input4)
         weight_diff = 76.253 - weight
         
         response = requests.get(url)

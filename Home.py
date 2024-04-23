@@ -33,16 +33,19 @@ def Home():
 
     if st.button('Generate Meal Plan'):
         sp_meal = sp()
-        url_user = sp_meal.generate_meal_plan(targetCalories, diet, exclude)
+        meal_data = sp_meal.generate_meal_plan(targetCalories, diet, exclude)
 
-        prediction = pred.pred(url_user, user_input1, user_input2, user_input3, user_input4, user_weight)
-        mealplan = MealPlan(url_user)
+        if meal_data:
+            prediction = pred.pred(meal_data, user_input1, user_input2, user_input3, user_input4, user_weight)
+            mealplan = MealPlan(meal_data)
 
-        # Save generated data to session state
-        st.session_state['meal_plan_data'] = {
-            'prediction': prediction,
-            'mealplan': mealplan,
-        }
+            # Use the prediction and mealplan objects as needed
+            # (Your existing code to display predictions and meal plans...)
+
+            st.session_state['meal_plan_data'] = {
+                'prediction': prediction,
+                'mealplan': mealplan,
+            }
 
     if 'meal_plan_data' in st.session_state:
         prediction = st.session_state['meal_plan_data']['prediction']
