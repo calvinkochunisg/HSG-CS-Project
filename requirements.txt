@@ -4,3 +4,9 @@ pandas
 pydeck
 streamlit
 requests
+matplotlib
+subprocess
+json
+pickle
+io
+mpl_toolkits
