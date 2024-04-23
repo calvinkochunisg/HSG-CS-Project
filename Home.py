@@ -51,6 +51,9 @@ def Home():
         day = st.selectbox('Select a day', ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'])
         meals = mealplan.get_day_mealplan(day)
 
+        if prediction:
+            st.pyplot(prediction)  # Show the plot
+
         st.write(f"Meals for {day}:")
         for i, meal in enumerate(meals):
             st.write(f"Meal {i+1}: {meal['title']}")

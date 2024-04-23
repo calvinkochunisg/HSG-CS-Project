@@ -97,7 +97,7 @@ class Prediction:
             pred.reset_index(drop=True, inplace=True)
             pred.index = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
             
-
+            fig = plt.figure(figsize=(10, 5))
             host = host_subplot(111)
             par = host.twinx()
 
@@ -114,11 +114,12 @@ class Prediction:
             par.yaxis.get_label().set_color(p2.get_color())
 
             #plt.show()
+            return fig
 
         else:
             print("Failed to download the file. Status code:", response.status_code)
 
-        return host 
+        return None 
 
 """
 Here the module can be testet, the following code will not be excecuted when importing the module somwhere else.
