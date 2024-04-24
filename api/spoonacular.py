@@ -39,9 +39,9 @@ class SpoonacularAPI:
             The diet to use when generating meal plans. Must be one of the valid diets.
         """
         # Constants
-        self._BASE_URL = st.secrets["SPOONACULAR_URL"] # Secrets are stored in the .streamlit/secrets.toml file
+        self._BASE_URL = "https://api.spoonacular.com/" # Secrets are stored in the .streamlit/secrets.toml file
         self._VALID_DIETS = ["gluten_free", "ketogenic", "vegetarian", "lacto-vegetarian", "ovo-vegetarian", "vegan", "pescetarian", "paleo", "primal", "low_fodmap", "whole30"]
-        self._API_KEY = st.secrets["SPOONACULAR_KEY"] # Secrets are stored in the .streamlit/secrets.toml file
+        self._API_KEY = "4deaceca7a6448ba9d2006710177aad3" # Secrets are stored in the .streamlit/secrets.toml file
 
         # Attributes
         self.diet = diet # This will call the setter method below see @diet.setter
@@ -76,7 +76,8 @@ class SpoonacularAPI:
             If the diet is not one of the valid diets.
         """
         if diet is not None and diet not in self._VALID_DIETS: # valid diets are defined in the __init__ method
-            raise ValueError(f"Invalid diet: {diet}. Valid options are: {', '.join(self._VALID_DIETS)}")
+            return None
+            #raise ValueError(f"Invalid diet: {diet}. Valid options are: {', '.join(self._VALID_DIETS)}")
         return diet
 
 
@@ -136,9 +137,9 @@ class SpoonacularAPI:
         # Checks if the parameters are valid and sets them to None if they are not
         # TODO: Add error handling here to raise errors when a parameter is wrong
         params = {
-                    "apiKey": self._api_key,
+                    "apiKey": self._API_KEY,
                     "timeframe": timeframe if timeframe in ["day", "week"] else "week",
-                    "targetCalories": targetCalories if  type(targetCalories) == int and targetCalories > 0 else None,
+                    "targetCalories": targetCalories if type(targetCalories) == int and targetCalories > 0 else None,
                     "diet": self.validate_diet(diet),
                     "exclude": ",".join(exclude) if exclude else None
                   }
@@ -150,19 +151,12 @@ class SpoonacularAPI:
         url = self.construct_url(endpoint, params)
 
         # Make the request to the API and raise an error if it fails
-        try:
-            response = requests.get(url)
-            response.raise_for_status()  # Raises a HTTPError if the response was an error
-        except requests.RequestException as e:
-            print(f"An error occurred while making the request: {e}")
+        response = requests.get(url)
+        if response.status_code == 200:
+            return response.json()
+        else:
+            response.raise_for_status()
             return None
-
-        # Save the response as a json object in data
-        data = response.json()
-
-        # TODO: Process Data here. Structure data and return it in a nice way for UI
-
-        return url
 
 
 
@@ -173,5 +167,5 @@ Here the module can be testet, the following code will not be excecuted when imp
 See Documentation of " if __name__ == "__main__": " here: https://realpython.com/if-name-main-python/
 """
 if __name__ == "__main__":
-    sp = SpoonacularAPI(diet = "vegetarian")
-    print(sp.generate_meal_plan())
+    sp = SpoonacularAPI()
+    print(sp.generate_meal_plan(diet = "vegetarian"))
