@@ -4,6 +4,7 @@ from api.ingredients import IngredientNames
 from api.mealplan import MealPlan
 from streamlit.logger import get_logger
 from data.prediction import Prediction as pred
+import pandas as pd
 
 def Home():
     st.set_page_config(
@@ -51,17 +52,50 @@ def Home():
         prediction = st.session_state['meal_plan_data']['prediction']
         mealplan = st.session_state['meal_plan_data']['mealplan']
 
+        # Select a day to display meals and nutrients
         day = st.selectbox('Select a day', ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'])
-        meals = mealplan.get_day_mealplan(day)
+        meals = mealplan.get_day_meals(day)
+        nutrients = mealplan.get_nutrient_info(day)
+        sp_api = sp()  # Initialize the API object
 
-        if prediction:
-            st.pyplot(prediction)  # Show the plot
-
+        # Display meal information
         st.write(f"Meals for {day}:")
         for i, meal in enumerate(meals):
             st.write(f"Meal {i+1}: {meal['title']}")
-
+        
+        st.write(f"Nutrient info for {day}:")
         nutrients = mealplan.get_nutrient_info(day)
-        st.write(f"Nutrient info for {day}: {nutrients}")
+        if nutrients:
+            # Convert nutrient dict to pandas DataFrame for plotting
+            nutrients_df = pd.DataFrame(list(nutrients.items()), columns=['Nutrient', 'Amount'])
+            st.bar_chart(nutrients_df.set_index('Nutrient'))
+
+        # Display predictions if available
+        if prediction:
+            st.pyplot(prediction)
+
+        if st.button('Generate Ingredient Lists'):
+            sp_api = sp()
+            # Fetch and store ingredients for the selected day and whole week
+            st.session_state['day_ingredients'] = mealplan.get_ingredients_for_day(day, sp_api)
+            st.session_state['week_ingredients'] = mealplan.get_ingredients_for_week(sp_api)
+
+        # Display daily ingredients if available
+        if 'day_ingredients' in st.session_state and st.session_state['day_ingredients']:
+            with st.expander(f"Show Ingredients for {day}"):
+                daily_df = pd.DataFrame(st.session_state['day_ingredients'])
+                st.table(daily_df[['amount', 'unit', 'ingredient']].sort_values('ingredient'))
+
+        # Display weekly ingredients if available
+        if 'week_ingredients' in st.session_state and st.session_state['week_ingredients']:
+            with st.expander("Show Ingredients for the Whole Week"):
+                weekly_df = pd.DataFrame(st.session_state['week_ingredients'])
+                st.table(weekly_df[['amount', 'unit', 'ingredient']].sort_values('ingredient'))
+
+        # ... (logic to display the nutrient info bar chart)
+
+
+
+
 
 Home()
