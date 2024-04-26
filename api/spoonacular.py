@@ -41,7 +41,7 @@ class SpoonacularAPI:
         # Constants
         self._BASE_URL = "https://api.spoonacular.com/" # Secrets are stored in the .streamlit/secrets.toml file
         self._VALID_DIETS = ["gluten_free", "ketogenic", "vegetarian", "lacto-vegetarian", "ovo-vegetarian", "vegan", "pescetarian", "paleo", "primal", "low_fodmap", "whole30"]
-        self._API_KEY = "f022a16717c0449aa8bef35c0896882c" # Secrets are stored in the .streamlit/secrets.toml file
+        self._API_KEY = "d8bd41eae35d45a795b002c36681af05" # Secrets are stored in the .streamlit/secrets.toml file
 
         # Attributes
         self.diet = diet # This will call the setter method below see @diet.setter
@@ -158,9 +158,12 @@ class SpoonacularAPI:
             response.raise_for_status()
             return None
     
-    def get_recipe_information(self, recipe_id):
+    def get_recipe_information(self, recipe_id, includeNutrition = False, addWinePairing = False, addTasteData = False):
         endpoint = f"recipes/{recipe_id}/information"
-        params = {"apiKey": self._API_KEY}
+        params = {"apiKey": self._API_KEY,
+                  "includeNutrition": includeNutrition,
+                  "addWinePairing": addWinePairing,
+                  "addTasteData": addTasteData}
         url = self.construct_url(endpoint, params)
         response = requests.get(url)
         if response.status_code == 200:

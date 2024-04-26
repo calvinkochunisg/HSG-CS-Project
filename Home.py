@@ -51,19 +51,22 @@ def Home():
     if 'meal_plan_data' in st.session_state:
         prediction = st.session_state['meal_plan_data']['prediction']
         mealplan = st.session_state['meal_plan_data']['mealplan']
+        sp_api = sp()
 
         # Select a day to display meals and nutrients
         day = st.selectbox('Select a day', ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'])
         meals = mealplan.get_day_meals(day)
-        nutrients = mealplan.get_nutrient_info(day)
-        sp_api = sp()  # Initialize the API object
 
-        # Display meal information
-        st.write(f"Meals for {day}:")
+        cols = st.columns(3)
         for i, meal in enumerate(meals):
-            st.write(f"Meal {i+1}: {meal['title']}")
-        
-        st.write(f"Nutrient info for {day}:")
+            meal_info = mealplan.get_recipe_information(sp_api, meal['id'])
+            if meal_info:
+                meal_type = meal_info['dishTypes'][0] if meal_info['dishTypes'] else 'Meal'
+                with cols[i % 3]:
+                    st.caption(f"{meal_type.capitalize()}")
+                    st.image(meal_info['image'], width=200)
+                    st.markdown(f"**{meal['title']}**")
+
         nutrients = mealplan.get_nutrient_info(day)
         if nutrients:
             # Convert nutrient dict to pandas DataFrame for plotting
@@ -74,7 +77,7 @@ def Home():
         if prediction:
             st.pyplot(prediction)
 
-        if st.button('Generate Ingredient Lists'):
+        if st.button('Generate Shopping Lists'):
             sp_api = sp()
             # Fetch and store ingredients for the selected day and whole week
             st.session_state['day_ingredients'] = mealplan.get_ingredients_for_day(day, sp_api)
@@ -82,13 +85,13 @@ def Home():
 
         # Display daily ingredients if available
         if 'day_ingredients' in st.session_state and st.session_state['day_ingredients']:
-            with st.expander(f"Show Ingredients for {day}"):
+            with st.expander(f"Show Shopping List for {day}"):
                 daily_df = pd.DataFrame(st.session_state['day_ingredients'])
                 st.table(daily_df[['amount', 'unit', 'ingredient']].sort_values('ingredient'))
 
         # Display weekly ingredients if available
         if 'week_ingredients' in st.session_state and st.session_state['week_ingredients']:
-            with st.expander("Show Ingredients for the Whole Week"):
+            with st.expander("Show Shopping List for the Whole Week"):
                 weekly_df = pd.DataFrame(st.session_state['week_ingredients'])
                 st.table(weekly_df[['amount', 'unit', 'ingredient']].sort_values('ingredient'))
 
