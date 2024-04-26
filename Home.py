@@ -97,18 +97,22 @@ def Home():
             st.session_state['week_ingredients'] = mealplan.get_ingredients_for_week(sp_api)
 
         # Display daily ingredients if available
+        # Display daily ingredients if available
         if 'day_ingredients' in st.session_state and st.session_state['day_ingredients']:
             with st.expander(f"Show Shopping List for {day}"):
                 daily_df = pd.DataFrame(st.session_state['day_ingredients'])
-                st.table(daily_df[['amount', 'unit', 'ingredient']].sort_values('ingredient'))
+                daily_df = daily_df[['amount', 'unit', 'ingredient']].sort_values('ingredient')
+                st.dataframe(daily_df, hide_index=True, use_container_width=True)
 
         # Display weekly ingredients if available
         if 'week_ingredients' in st.session_state and st.session_state['week_ingredients']:
             with st.expander("Show Shopping List for the Whole Week"):
                 weekly_df = pd.DataFrame(st.session_state['week_ingredients'])
-                st.table(weekly_df[['amount', 'unit', 'ingredient']].sort_values('ingredient'))
+                weekly_df = weekly_df[['amount', 'unit', 'ingredient']].sort_values('ingredient')
+                st.dataframe(weekly_df, hide_index=True, use_container_width=True)
 
-        # ... (logic to display the nutrient info bar chart)
+
+
 
 def display_weekly_meals(mealplan, sp_api):
     WEEKDAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
