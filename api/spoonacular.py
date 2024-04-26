@@ -41,7 +41,7 @@ class SpoonacularAPI:
         # Constants
         self._BASE_URL = "https://api.spoonacular.com/" # Secrets are stored in the .streamlit/secrets.toml file
         self._VALID_DIETS = ["gluten_free", "ketogenic", "vegetarian", "lacto-vegetarian", "ovo-vegetarian", "vegan", "pescetarian", "paleo", "primal", "low_fodmap", "whole30"]
-        self._API_KEY = "d8bd41eae35d45a795b002c36681af05" # Secrets are stored in the .streamlit/secrets.toml file
+        self._API_KEY = "3de648be11164f0c9bc478fb707f6e18" # Secrets are stored in the .streamlit/secrets.toml file
 
         # Attributes
         self.diet = diet # This will call the setter method below see @diet.setter
