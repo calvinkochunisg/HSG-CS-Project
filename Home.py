@@ -53,34 +53,47 @@ def Home():
         mealplan = st.session_state['meal_plan_data']['mealplan']
         sp_api = sp()
 
-        # Select a day to display meals and nutrients
-        day = st.selectbox('Select a day', ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'])
-        meals = mealplan.get_day_meals(day)
+        # Select a day or the whole week to display meals and nutrients
+        options = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday', 'Whole Week']
+        day = st.selectbox('Select a day', options)
 
-        cols = st.columns(3)
-        for i, meal in enumerate(meals):
-            meal_info = mealplan.get_recipe_information(sp_api, meal['id'])
-            if meal_info:
-                meal_type = meal_info['dishTypes'][0] if meal_info['dishTypes'] else 'Meal'
-                with cols[i % 3]:
-                    st.caption(f"{meal_type.capitalize()}")
-                    st.image(meal_info['image'], width=200)
-                    st.markdown(f"**{meal['title']}**")
-
-        nutrients = mealplan.get_nutrient_info(day)
-        if nutrients:
-            # Convert nutrient dict to pandas DataFrame for plotting
-            nutrients_df = pd.DataFrame(list(nutrients.items()), columns=['Nutrient', 'Amount'])
-            st.bar_chart(nutrients_df.set_index('Nutrient'))
+        if day == 'Whole Week':
+            # Display meals for the whole week
+            display_weekly_meals(mealplan, sp_api)
+            # Handle nutrient information for the whole week
+            try:
+                week_nutrients = mealplan.get_nutrients_for_week()
+                st.subheader('Nutrient Information - Whole Week')
+                week_nutrients_df = pd.DataFrame(list(week_nutrients.items()), columns=['Nutrient', 'Amount'])
+                st.bar_chart(week_nutrients_df.set_index('Nutrient'))
+            except Exception as e:
+                st.error(f"Could not retrieve nutrient information for the whole week. Error: {e}")
+        else:
+            # Display meals for the selected day
+            st.subheader(f'Mealplan Information for {day}')
+            display_day_meals(day.lower(), mealplan, sp_api)
+            # Handle nutrient information for the selected day
+            try:
+                nutrients = mealplan.get_nutrient_info(day.lower())
+                if nutrients:
+                    st.subheader(f'Nutrient Information for {day}')
+                    nutrients_df = pd.DataFrame(list(nutrients.items()), columns=['Nutrient', 'Amount'])
+                    st.bar_chart(nutrients_df.set_index('Nutrient'))
+            except KeyError:
+                st.error(f"Nutrient information for {day} is not available.")
 
         # Display predictions if available
         if prediction:
+            st.subheader('Weight Prediction')
             st.pyplot(prediction)
 
+        # Button and logic for generating shopping lists
+        st.subheader('Shopping List')
         if st.button('Generate Shopping Lists'):
             sp_api = sp()
             # Fetch and store ingredients for the selected day and whole week
-            st.session_state['day_ingredients'] = mealplan.get_ingredients_for_day(day, sp_api)
+            if day != 'Whole Week':
+                st.session_state['day_ingredients'] = mealplan.get_ingredients_for_day(day.lower(), sp_api)
             st.session_state['week_ingredients'] = mealplan.get_ingredients_for_week(sp_api)
 
         # Display daily ingredients if available
@@ -97,7 +110,25 @@ def Home():
 
         # ... (logic to display the nutrient info bar chart)
 
+def display_weekly_meals(mealplan, sp_api):
+    WEEKDAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+    meal_labels = ["Breakfast", "Lunch", "Dinner"]  # Labels for the meals
 
+    for day in WEEKDAYS:
+        st.markdown(f"#### {day}")
+        display_day_meals(day.lower(), mealplan, sp_api)
+
+def display_day_meals(day, mealplan, sp_api):
+    meals = mealplan.get_day_meals(day)
+    meal_labels = ["Breakfast", "Lunch", "Dinner"]  # Move this inside the function
+    cols = st.columns(3)
+    for i, meal in enumerate(meals):
+        meal_info = mealplan.get_recipe_information(sp_api, meal['id'])
+        if meal_info:
+            with cols[i % 3]:
+                st.caption(meal_labels[i % len(meal_labels)])
+                st.image(meal_info['image'], width=200)
+                st.markdown(f"**{meal['title']}**")
 
 
 

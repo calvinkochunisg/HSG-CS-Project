@@ -45,6 +45,14 @@ class MealPlan:
         aggregated_ingredients = [{'amount': amt, 'unit': unit, 'ingredient': name} for (name, unit), amt in weekly_ingredient_aggregator.items()]
 
         return aggregated_ingredients
+    
+    def get_nutrients_for_week(self):
+        week_nutrients = {'calories': 0, 'protein': 0, 'fat': 0, 'carbohydrates': 0}
+        for day in self.data['week']:
+            day_nutrients = self.get_nutrient_info(day)
+            for nutrient, amount in day_nutrients.items():
+                week_nutrients[nutrient] += amount
+        return week_nutrients
 
 class Meal:
     def __init__(self, id, title, ingredients):
