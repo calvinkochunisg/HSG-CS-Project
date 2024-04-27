@@ -2,6 +2,7 @@ import streamlit as st
 from api.spoonacular import SpoonacularAPI as sp
 from api.ingredients import IngredientNames
 from api.mealplan import MealPlan
+from user.user_profile import UserProfile
 from streamlit.logger import get_logger
 from data.prediction import Prediction as pred
 import pandas as pd
@@ -13,31 +14,28 @@ def Home():
     )
 
     st.title('Prediction Inputs')
-    WEEKDAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
     VALID_DIETS = ["gluten_free", "ketogenic", "vegetarian", "lacto-vegetarian", "ovo-vegetarian", "vegan", "pescetarian", "paleo", "primal", "low_fodmap", "whole30"]
     VALID_INGREDIENTS = IngredientNames.get_ingredient_names()
     VALID_INTOLERANCES = ['dairy', 'egg', 'gluten', 'grain', 'peanut', 'seafood', 'sesame', 'shellfish', 'soy', 'sulfite', 'tree nut', 'wheat']
     EXCLUDE = VALID_INGREDIENTS + VALID_INTOLERANCES
 
-    with st.expander('open options'):
-        user_input1 = st.multiselect('When do you go walking?', WEEKDAYS)
-        user_input2 = st.multiselect('When do you go running?', WEEKDAYS)
-        user_input3 = st.multiselect('When do you drink wine?', WEEKDAYS)
-        user_input4 = st.multiselect('When do you lift weights?', WEEKDAYS)
-        user_weight = st.number_input("Bodyweight", value=60, min_value=0, max_value=500, placeholder="Insert your current bodyweight in kg ...")
-        
-    st.title('Mealplan Inputs')
-    with st.expander('open options'):
-        targetCalories = st.number_input("Target Calories", value=2000, min_value=0, max_value=10000, placeholder="Insert your target Calories in kcal ...")
+    with st.expander('User Inputs'):
+        height = st.number_input('Height (cm)', value=180, min_value=0, max_value=250, placeholder="Insert your current height in cm ...")
+        weight = st.number_input('Weight (kg)', value=60, min_value=0, max_value=500, placeholder="Insert your current bodyweight in kg ...")
+        age = st.number_input('Age', value=30, min_value=0, max_value=150, placeholder="Insert your current age in years ...")
+        gender = st.radio('Biological Gender', ['Male', 'Female'])
+        activity_type = st.radio('Activity Level', ['Light', 'Moderate', 'Active', 'Very Active', 'Extra Active'])
         diet = st.multiselect('Do you follow any special diets?', VALID_DIETS)
         exclude = st.multiselect('Is there something you cannot eat?', EXCLUDE)
-
+        user_profile = UserProfile(height, weight, age, gender, activity_type, diet, exclude)
+        st.text(f'Calories needed per day: {user_profile.calories_needed:.2f} kcal')
+        
     if st.button('Generate Meal Plan'):
         sp_meal = sp()
-        meal_data = sp_meal.generate_meal_plan(targetCalories, diet, exclude)
+        meal_data = sp_meal.generate_meal_plan(user_profile.calories_needed, user_profile.diet, user_profile.exclude)
 
         if meal_data:
-            prediction = pred.pred(meal_data, user_input1, user_input2, user_input3, user_input4, user_weight)
+            prediction = pred.pred(meal_data, user_profile.walking_days, user_profile.running_days, user_profile.wine_days, user_profile.weights_days, user_profile.weight)
             mealplan = MealPlan(meal_data)
 
             # Use the prediction and mealplan objects as needed
