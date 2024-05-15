@@ -157,18 +157,34 @@ class SpoonacularAPI:
         else:
             response.raise_for_status()
             return None
-    
-    def get_recipe_information(self, recipe_id, includeNutrition = False, addWinePairing = False, addTasteData = False):
+    def get_recipe_information(self, recipe_id, includeNutrition=False, addWinePairing=False, addTasteData=False):
+        """
+        Retrieves detailed information about a recipe from the API.
+
+        :param recipe_id: The unique identifier for the recipe.
+        :param includeNutrition: Boolean indicating whether to include nutrition info.
+        :param addWinePairing: Boolean indicating whether to include wine pairing info.
+        :param addTasteData: Boolean indicating whether to include taste profile info.
+        :return: A dictionary with detailed recipe information, or None if the request fails.
+        """
+        # The endpoint for getting recipe information, appended with the recipe ID.
         endpoint = f"recipes/{recipe_id}/information"
-        params = {"apiKey": self._API_KEY,
-                  "includeNutrition": includeNutrition,
-                  "addWinePairing": addWinePairing,
-                  "addTasteData": addTasteData}
+        # Parameters for the request. Conditionally include based on the function arguments.
+        params = {
+            "apiKey": self._API_KEY,  # API key for authenticating the request.
+            "includeNutrition": includeNutrition,  # Determines if nutrition data should be included.
+            "addWinePairing": addWinePairing,  # Determines if wine pairing data should be included.
+            "addTasteData": addTasteData  # Determines if taste profile data should be included.
+        }
+        # Construct the full URL with parameters.
         url = self.construct_url(endpoint, params)
+        # Make the GET request to the Spoonacular API.
         response = requests.get(url)
+        # If the response is successful (status code 200), return the recipe information.
         if response.status_code == 200:
             return response.json()
         else:
+            # If the response is not successful, raise an HTTPError.
             response.raise_for_status()
             return None
 
